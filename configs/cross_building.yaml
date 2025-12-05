@@ -1,0 +1,50 @@
+# Cross-Building Generalization Configuration
+
+experiment:
+  name: "cross_building_generalization"
+  description: "Train on one building, test on others to evaluate transferability"
+
+# Buildings
+buildings:
+  - Building_1
+  - Building_2
+  - Building_3
+
+# Cross-validation folds
+# Each fold: train on one building, validate on second, test on third
+folds:
+  - train: "Building_1"
+    validation: "Building_2"
+    test: "Building_3"
+
+  - train: "Building_2"
+    validation: "Building_3"
+    test: "Building_1"
+
+  - train: "Building_3"
+    validation: "Building_1"
+    test: "Building_2"
+
+# Data configuration (inherits from baseline.yaml)
+data:
+  target_variable: "cooling_demand"  # PRIMARY (heating=0 in summer)
+  sequence_length: 24  # 24h lookback
+  forecast_horizon: 3  # predict 3h ahead (or multi-horizon: [1,3,6,24])
+
+# Models to test (same as baseline)
+models:
+  - lstm
+  - lstm_encoder_decoder
+  - lstm_attention
+
+# Aggregation
+aggregation:
+  compute_mean: true
+  compute_std: true
+  statistical_tests: true  # t-test, ANOVA across folds
+
+# Output
+output:
+  results_dir: "../results/cross_building"
+  save_per_fold: true
+  save_aggregated: true

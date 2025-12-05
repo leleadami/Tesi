@@ -1,0 +1,48 @@
+# LSTM Autoencoder Configuration
+
+# Data parameters
+data:
+  target_variable: "cooling_demand"  # Primary target (heating_demand=0 in summer!)
+  sequence_length: 24                # Lookback window (hours)
+  forecast_horizon: 1                # Predict N hours ahead
+
+# Model architecture
+model:
+  name: "lstm_autoencoder"
+  hidden_size: 128      # LSTM hidden units
+  bottleneck_size: 32   # Compressed representation size (smaller = more compression)
+  num_layers: 2         # Number of stacked LSTM layers
+  dropout: 0.2          # Dropout rate
+  output_size: 1        # Single value prediction
+  use_skip_connections: false  # Skip connections: concatena bottleneck + hidden state
+
+# Training parameters
+training:
+  batch_size: 32
+  num_epochs: 100                  # Total epochs (pretrain + finetune)
+  learning_rate: 0.001
+  weight_decay: 0.0001             # L2 regularization
+  early_stopping_patience: 15      # Stop if no improvement for N epochs
+  gradient_clip: 1.0               # Max gradient norm (prevent exploding gradients)
+  seed: 42                         # Random seed for reproducibility
+
+  # Autoencoder specific (two-phase training)
+  pretrain_epochs: 100  # Phase 1: Reconstruction training (mode='reconstruction')
+  finetune_epochs: 100  # Phase 2: Forecasting training (mode='forecast')
+
+# Evaluation metrics
+metrics:
+  - mae
+  - rmse
+  - mse
+  - mape
+  - smape
+  - r2
+
+# Output paths (relative to experiment script)
+output:
+  results_dir: "../../results"
+  checkpoint_dir: "../../results/checkpoints"
+  figures_dir: "../../results/figures"
+  save_predictions: true
+  save_models: true

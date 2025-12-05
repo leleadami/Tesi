@@ -1,0 +1,43 @@
+# K-Fold Cross Validation - Single Building Configuration
+
+experiment:
+  name: "kfold_single_building"
+  description: "K-fold cross validation su singolo building"
+
+  # Sliding window parameters (time series aware)
+  use_sliding_window: true  # Use TimeSeriesSlidingWindow instead of standard KFold
+  train_size: 0.4  # 40% of data for training window
+  test_size: 0.2   # 20% of data for test window
+  step: 0.1        # 10% offset between consecutive folds
+
+  # Legacy K-fold parameters (ignored if use_sliding_window=true)
+  k_folds: 5
+  shuffle: false  # NO shuffle per time series!
+  random_state: 42
+
+data:
+  phase: "phase_1"  # 720h
+  target_variable: "cooling_demand"  # Prima cooling_demand, poi carbon_intensity, solar_generation
+  sequence_length: 24  # 24h lookback
+  forecast_horizon: 1  # 1h ahead
+  
+  weather_features:
+    - "outdoor_dry_bulb_temperature"
+    - "outdoor_relative_humidity"
+    - "diffuse_solar_irradiance"
+    - "direct_solar_irradiance"
+
+# Model configurations (verranno caricate dai config esistenti)
+# Usa configs/baseline.yaml, configs/encoder_decoder.yaml, ecc.
+
+training:
+  num_epochs: 100
+  early_stopping_patience: 15
+  gradient_clip: 1.0
+  seed: 42
+
+results:
+  save_checkpoints: true
+  save_scatter_plots: true
+  save_individual_folds: true  # Salva plot per ogni fold
+  save_aggregated: true  # Salva plot aggregato con mean ± std

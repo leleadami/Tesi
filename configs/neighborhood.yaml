@@ -1,0 +1,42 @@
+# Neighborhood-Level Forecasting Configuration
+
+experiment:
+  name: "neighborhood_aggregation"
+  description: "Forecast total neighborhood consumption (sum of 3 buildings)"
+
+# Aggregation strategy
+aggregation:
+  method: "sum"  # sum, mean, weighted_sum
+  buildings:
+    - Building_1
+    - Building_2
+    - Building_3
+
+# Data configuration
+data:
+  target_variable: "heating_demand"  # will be summed across buildings
+  sequence_length: 24
+  forecast_horizon: 1
+
+  # Use Phase 1 and Phase 2
+  train_phase: 1
+  test_phase: 2
+  train_split: 0.8
+  val_split: 0.2
+
+# Models
+models:
+  - lstm
+  - lstm_encoder_decoder
+
+# Comparison
+comparison:
+  # Compare neighborhood-level vs individual building forecasts
+  compare_with_individual: true
+  individual_aggregation_method: "sum_predictions"  # sum individual predictions
+
+# Output
+output:
+  results_dir: "../results/neighborhood"
+  save_predictions: true
+  save_comparison_plots: true
